@@ -1,0 +1,14 @@
+node_modules/
+client/dist/
+client/dist-cvm/
+server/dist/
+server/.generated/
+*.tsbuildinfo
+app.db
+app.db-journal
+app.db-wal
+app.db-shm
+blobs/
+.bun-cache/
+.space-build/
+.DS_Store

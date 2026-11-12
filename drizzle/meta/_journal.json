@@ -1,0 +1,48 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1794325053021,
+      "tag": "0001_initial",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1794325053021,
+      "tag": "0002_flashcard_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794332270726,
+      "tag": "0003_add_speech_failure_reason",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1794381701274,
+      "tag": "0004_add_find_jobs",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1794389343161,
+      "tag": "0005_add_behavior_grading_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1794404249804,
+      "tag": "0006_add_auto_read_setting",
+      "breakpoints": true
+    }
+  ]
+}

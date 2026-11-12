@@ -1,0 +1,8 @@
+{
+  "runtime": "typescript",
+  "platformVersion": 28,
+  "entry": "client/dist/index.html",
+  "name": "儿童英语单词闪卡",
+  "slug": "er-tong-ying-yu-dan-ci-shan-qia-2",
+  "managedCronJobs": []
+}

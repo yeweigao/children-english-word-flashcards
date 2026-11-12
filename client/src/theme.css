@@ -1,0 +1,312 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap');
+@import "tailwindcss";
+@import "tailwindcss-safe-area";
+
+@theme {
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-sm: 14px;
+  --text-sm--line-height: 20px;
+  --text-base: 16px;
+  --text-base--line-height: 24px;
+  --text-lg: 18px;
+  --text-lg--line-height: 28px;
+  --text-xl: 20px;
+  --text-xl--line-height: 28px;
+  --text-2xl: 24px;
+  --text-2xl--line-height: 32px;
+  --text-3xl: 30px;
+  --text-3xl--line-height: 36px;
+  --text-4xl: 36px;
+  --text-4xl--line-height: 40px;
+  --text-5xl: 48px;
+  --text-5xl--line-height: 52px;
+  --font-display: "Baloo 2", ui-rounded, system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: light dark;
+  --bg: #eef7e2;
+  --surface: #ffffff;
+  --surface-alt: #f6fbef;
+  --text: #2e3a24;
+  --dim: #71835f;
+  --border: #dcebc8;
+  --accent: #58cc02;
+  --accent-deep: #46a302;
+  --sky: #1cb0f6;
+  --sky-deep: #1899d6;
+  --sun: #ffc800;
+  --sun-deep: #e0a800;
+  --coral: #ff4b4b;
+  --coral-deep: #d33131;
+  --radius: 20px;
+  --space-surface: var(--surface);
+  --space-surface-alt: var(--surface-alt);
+  --space-muted: var(--dim);
+  --space-border: var(--border);
+  --space-accent: var(--accent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141c10;
+    --surface: #22301a;
+    --surface-alt: #2a3d20;
+    --text: #eef6e2;
+    --dim: #a5bb90;
+    --border: #3a5230;
+    --accent: #7ed321;
+    --accent-deep: #58cc02;
+    --sky: #38c0f8;
+    --sky-deep: #1cb0f6;
+    --sun: #ffd23e;
+    --sun-deep: #ffc800;
+    --coral: #ff6b6b;
+    --coral-deep: #ff4b4b;
+  }
+}
+
+/* Phone tap targets: at least 32px tall. */
+@layer base {
+  button, [role="button"], select, summary, input:not([type="checkbox"], [type="radio"]) {
+    min-height: 2rem;
+  }
+  /* The page must never pan sideways: decorative transforms (the
+     path coins drift ±54px on their S-curve, pop animations) extend
+     elements' visual boxes past the viewport, which otherwise makes
+     the whole document horizontally scrollable — on the phone the
+     page then rests shifted, with content cut on one side and a
+     blank strip on the other. clip (not hidden) so no scroll
+     container is created and fixed chrome keeps working. */
+  html, body {
+    overflow-x: hidden;
+    overflow-x: clip;
+  }
+}
+
+/* Celebration pop for real achievements (correct dig, rescue, clear,
+   graduation). One short bounce, then still — no idle motion. */
+@keyframes cheer-pop {
+  0% { transform: scale(0.7); opacity: 0; }
+  60% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-cheer {
+  animation: cheer-pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+@keyframes node-done {
+  0% { transform: scale(0.6); }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.animate-node-done {
+  animation: node-done 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+/* Card flip: one tap turns the card over (quiz front -> word back ->
+   dig face). A quick rotateY swing, then still. */
+@keyframes flip-in {
+  0% { transform: perspective(900px) rotateY(-68deg) scale(0.97); opacity: 0.25; }
+  100% { transform: perspective(900px) rotateY(0deg) scale(1); opacity: 1; }
+}
+.animate-flip {
+  /* fill backwards only: a lingering transform would become the
+     containing block for the fixed feedback sheet inside the dig
+     face and un-anchor it from the bottom of the screen. */
+  animation: flip-in 0.38s cubic-bezier(0.2, 0.9, 0.3, 1.08) backwards;
+  transform-origin: center;
+}
+
+/* Feedback sheet: Duolingo-style, pops up from the bottom of the
+   screen the moment an answer lands. */
+@keyframes sheet-up {
+  0% { transform: translateY(106%); }
+  100% { transform: translateY(0); }
+}
+.animate-sheet {
+  animation: sheet-up 0.34s cubic-bezier(0.2, 1.05, 0.3, 1) both;
+}
+
+/* Stars bursting on a correct answer (staggered via inline delay). */
+@keyframes star-pop {
+  0% { transform: scale(0) rotate(-32deg); opacity: 0; }
+  70% { transform: scale(1.3) rotate(10deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.animate-star-pop {
+  animation: star-pop 0.42s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+/* A gentle shake for a wrong pick — a nudge, never a punishment. */
+@keyframes shake-x {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-7px); }
+  55% { transform: translateX(6px); }
+  80% { transform: translateX(-3px); }
+}
+.animate-shake {
+  animation: shake-x 0.35s ease both;
+}
+
+
+/* React-Bits-style micro-motion, hand-rolled (the library ships as
+   registry components, not an installable package here, so these are
+   same-style lightweight equivalents): short, crisp, and only on
+   emotional moments — never on parent/tool pages. */
+
+/* Camera hero button: a slow breathing glow so it reads as alive and
+   tappable; stops the moment it is pressed/busy via :disabled. */
+@keyframes breathe-glow {
+  0%, 100% { box-shadow: 0 8px 0 var(--sky-deep), 0 0 0 0 rgba(28, 176, 246, 0.35); }
+  50% { box-shadow: 0 8px 0 var(--sky-deep), 0 0 0 14px rgba(28, 176, 246, 0); }
+}
+.animate-breathe {
+  animation: breathe-glow 2.6s ease-in-out infinite;
+}
+.animate-breathe:disabled { animation: none; }
+
+/* SplitText-style entrance for the celebration headline: characters
+   pop in one by one (stagger via inline delay), then still. */
+@keyframes char-pop {
+  0% { transform: translateY(0.35em) scale(0.6); opacity: 0; }
+  60% { transform: translateY(-0.04em) scale(1.12); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.animate-char-pop {
+  display: inline-block;
+  animation: char-pop 0.34s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+/* BlurText-style entrance for the big word on the card back. */
+@keyframes blur-in {
+  0% { filter: blur(7px); opacity: 0; transform: scale(0.96); }
+  100% { filter: blur(0); opacity: 1; transform: scale(1); }
+}
+.animate-blur-in {
+  animation: blur-in 0.32s ease-out both;
+}
+
+/* Reading-wait scene: while the vision model reads the photographed
+   pages (tens of seconds, sometimes minutes for a multi-page exam),
+   the wait itself is the show — a scanner beam sweeping the paper,
+   letter chips popping around it, and an indeterminate shimmer bar.
+   Loops are calm and slow; the stage line and elapsed seconds carry
+   the real progress information. */
+@keyframes scan-y {
+  0% { transform: translateY(-14px); opacity: 0.4; }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { transform: translateY(198px); opacity: 0.4; }
+}
+.animate-scan {
+  animation: scan-y 2.8s ease-in-out infinite alternate;
+}
+@keyframes float-pop {
+  0% { transform: translateY(10px) scale(0.55) rotate(-8deg); opacity: 0; }
+  30% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translateY(-16px) scale(1) rotate(6deg); opacity: 0; }
+}
+.animate-float-pop {
+  animation: float-pop 3.4s ease-in-out infinite;
+}
+@keyframes shimmer-slide {
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(280%); }
+}
+.animate-shimmer {
+  animation: shimmer-slide 1.6s ease-in-out infinite;
+}
+
+/* Example deck: a new top card settles in from the side it was
+   swiped toward — one short glide, then still. The stack itself is
+   layout (offset + scale on the cards underneath), not animation. */
+@keyframes deck-in-left {
+  0% { opacity: 0.35; transform: translateX(26px) scale(0.98); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes deck-in-right {
+  0% { opacity: 0.35; transform: translateX(-26px) scale(0.98); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+.animate-deck-in-left {
+  animation: deck-in-left 0.22s ease-out both;
+}
+.animate-deck-in-right {
+  animation: deck-in-right 0.22s ease-out both;
+}
+
+/* Current path node: one soft ring pulse to show where you are. */
+@keyframes ring-pulse {
+  0% { box-shadow: 0 4px 0 var(--sun-deep), 0 0 0 0 rgba(255, 200, 0, 0.4); }
+  100% { box-shadow: 0 4px 0 var(--sun-deep), 0 0 0 12px rgba(255, 200, 0, 0); }
+}
+.animate-ring-pulse {
+  animation: ring-pulse 1.1s ease-out 2;
+}
+
+/* Combo burst: at a first-try streak milestone (×3 / ×5 / ×10) the
+   words 「连击 ×N」 pop up in the CENTRE of the screen — big, sticker-
+   style, characters staggering in (char-pop rides on each letter) —
+   then the whole burst is gone. It lives and dies inside the beat
+   that earned it; sessions clear it on every step change, so it can
+   never be carried onto the next screen. */
+@keyframes combo-pop {
+  0% { transform: scale(0.45) rotate(-4deg); opacity: 0; }
+  55% { transform: scale(1.14) rotate(1.5deg); opacity: 1; }
+  75% { transform: scale(0.97) rotate(0deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.animate-combo-pop {
+  animation: combo-pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+/* Current level coin on the home path: a slow, gentle bob so the
+   coin (and the 「开始」 bubble riding above it) reads as alive and
+   tappable — the Duolingo "you are here" bounce, kept calm. */
+@keyframes node-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.animate-node-bob {
+  animation: node-bob 1.7s ease-in-out infinite;
+}
+
+/* The study-card BASE height, shared by every face of both learning
+   sessions (front, both back beats, the example deck, the dig face
+   with its warmups): a min-height FLOOR, not a fixed height. The
+   floor is 52dvh — tall enough that a short face (the example deck
+   above all) still reads as the same card as every other face, well
+   short of the old fill-the-screen frame. No face may sit below the
+   floor; any face whose content runs taller (the front's four
+   options, a long dig task) GROWS the card with it — content is
+   never cropped to fit the frame, not even half a row. Priority:
+   no cropping > the shared floor > no empty card. Leftover screen
+   space belongs OUTSIDE the card, in the gap between the card and
+   the bottom action bar. Faces are flex-1 children of the
+   .study-card-h region, so they stretch to the floor and grow past
+   it together with the region. The example deck's top card also
+   wears this class directly (its beat adds a word header above the
+   deck), so the deck card itself — not just its region — stands at
+   the floor height. */
+.study-card-h {
+  min-height: clamp(19rem, 52dvh, 34rem);
+}
+
+/* Fixed clearance under a session's bottom action bar: the shell's
+   floating bottom bar overlays the lowest ~80px of the screen, so
+   the action bar reserves this much room below itself and its button
+   stays fully visible and fully tappable on every step. */
+.shell-bar-gap {
+  height: 5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-cheer, .animate-node-done, .animate-flip, .animate-sheet,
+  .animate-star-pop, .animate-shake, .animate-breathe,
+  .animate-char-pop, .animate-blur-in, .animate-ring-pulse, .animate-node-bob,
+  .animate-combo-pop,
+  .animate-scan, .animate-float-pop, .animate-shimmer,
+  .animate-deck-in-left, .animate-deck-in-right { animation: none; }
+}
